@@ -322,7 +322,7 @@ break: Keluar dari loop jika pengguna memasukkan perintah 'byebye'.
 
 pastikan antar client dan server sudah terhubung baik sehingga program dapat dijalankan
 
-[reference images] assets/koneksiawal.png
+[reference images](assets/koneksiawal%20.png)
 
 
 
