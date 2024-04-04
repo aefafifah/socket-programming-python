@@ -48,7 +48,7 @@ berada dalam server.py di mana ls berfungsi untuk mengirim daftar list file dan 
 
 output yang dihasilkan dari pemanggilan command ls:
 
-[reference images](assets/ls%20output.png)
+![reference images](assets/ls%20output.png)
 
 2. command rm 
 
@@ -64,7 +64,7 @@ def remove_file(filename):
 
 command rm berfungsi untuk menghapus sebuah file yang ada di dalam direktori, pertamanya akan mengecek apakah path yang dituju ada ( dibantu dengan library os yang disediakan oleh python) ketika file yang dicari ada maka akan menghapus file tersebut jika tidak maka akan mengembalikan pesan file does not exist 
 
-[reference images](assets/rm.png)
+![reference images](assets/rm.png)
 
 3. command download 
 
@@ -83,7 +83,7 @@ def download(conn, filename):
 
 command download berfungsi untuk mendownload sebuah file ( membaca file yang dituju ) 
 
-[reference images](assets/download.png)
+![reference images](assets/download.png)
 
 4. command upload 
 
@@ -101,8 +101,8 @@ def upload(conn, filename):
 
 command upload berfungsi untuk mengupload sebuah file yang akan dibuat, dalam program ini masih terdapat bug di saat file berhasil diupload koneksi antar socket, namun program ini sudah bisa mengupload file dengan berhasil 
 
-[reference images](assets/upload.png) 
-[reference images](assets/kondisiupload.png)
+![reference images](assets/upload.png) 
+![reference images](assets/kondisiupload.png)
 
 5. command size 
 
@@ -116,7 +116,7 @@ def get_file_size(filename):
 ```
 command size digunakan untuk mendapatkan ukuran dari suatu file dengan bantuan library os kita dapat mendapatkan ukuran suatu file 
 
-[reference images](assets/size.png)
+![reference images](assets/size.png)
 
 6. command bye bye 
 
@@ -130,8 +130,8 @@ command size digunakan untuk mendapatkan ukuran dari suatu file dengan bantuan l
 
 bye bye akan langsung dihandel oleh sebuah fungsi bernama handle conn yang isi fungsi tersebut adalah untuk memeriksa setiap command, dan jika command adalah byebye maka conn.close() berarti mengakhiri hubungan antar socket
 
-[reference images](assets/byebye.png)
-[reference images](assets/byebyeout.png)
+![reference images](assets/byebye.png)
+![reference images](assets/byebyeout.png)
 
 7. command connme 
 
@@ -143,7 +143,7 @@ elif command[0] == 'connme':
 ```
 command connme berfungsi untuk memastikan apakah sebuah socket telah terhubung apa tidak 
 
-[reference images](assets/connme.png)
+![reference images](assets/connme.png)
 
 # Program Server
 
