@@ -322,12 +322,8 @@ break: Keluar dari loop jika pengguna memasukkan perintah 'byebye'.
 
 pastikan antar client dan server sudah terhubung baik sehingga program dapat dijalankan
 
-<<<<<<< HEAD
-https://github.com/aefafifah/socket-programming-python/blob/main/assets/koneksi%20awal.png
-=======
 
 ![koneksiawal](https://github.com/aefafifah/socket-programming-python/blob/main/assets/koneksi%20awal.png)
->>>>>>> d1a13c6d1319e7449064e6f44c706c2028f563bb
 
 
 
