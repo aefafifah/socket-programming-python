@@ -107,13 +107,33 @@ command upload berfungsi untuk mengupload sebuah file yang akan dibuat, dalam pr
 5. command size 
 
 ```sh
+def convert_size(size_bytes):
+    # Daftar ukuran file 
+    units = ['B', 'KB', 'MB', 'GB', 'TB']
+
+    # Perulangan yang mengecek berapa ukuran file
+    for unit in units:
+    # jika kurang dari 1024 maka b
+        if size_bytes < 1024:
+            if unit == 'B':
+                return "{} {}".format(int(size_bytes), unit)
+            else:
+                return "{:.2f} {}".format(size_bytes, unit)
+        size_bytes /= 1024
+
+    return "{:.2f} {}".format(size_bytes, units[-1])
+
 def get_file_size(filename):
+# pengecekan jika file tersedia
     if os.path.exists(filename):
+    # memanfaatkan library os untuk mendapat ukuran 
         size_bytes = os.path.getsize(filename)
-        return str(size_bytes)
+        # memanggil fungsi convert size
+        return convert_size(size_bytes)
     else:
         return "File {} does not exist.".format(filename)
 ```
+
 command size digunakan untuk mendapatkan ukuran dari suatu file dengan bantuan library os kita dapat mendapatkan ukuran suatu file 
 
 ![reference images](assets/size.png)
@@ -130,7 +150,10 @@ command size digunakan untuk mendapatkan ukuran dari suatu file dengan bantuan l
 
 bye bye akan langsung dihandel oleh sebuah fungsi bernama handle conn yang isi fungsi tersebut adalah untuk memeriksa setiap command, dan jika command adalah byebye maka conn.close() berarti mengakhiri hubungan antar socket
 
-![reference images](assets/byebye.png)
+![reference images](assets/byebye.png) 
+
+dan ketika kita mencoba untuk memasukkan command lagi akan error 
+
 ![reference images](assets/byebyeout.png)
 
 7. command connme 
@@ -266,33 +289,23 @@ library yang dibutuhkan adalah socket, karena kita membutuhkan client yang akan 
 
 ```sh
 def main():
-    HOST = '127.0.0.1'
-    PORT = 12345
+    HOST = '127.0.0.1'  
+    PORT = 12345        
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
         print("Connected to server.")
 
-        client_socket.sendall('connme'.encode('utf-8'))
-        response = client_socket.recv(1024).decode('utf-8')
-        print(response)
         while True:
             command = input("Enter command: ")
-            client_socket.sendall(command.encode('utf-8'))
 
-            if command == 'byebye':
-                print("Closing connection.")
+            if command.lower() == 'exit':
+                client_socket.sendall(command.encode('utf-8'))
                 break
 
-            response = client_socket.recv(4096).decode('utf-8')
-            print(response)
-            
-            while "Continue" in response:
-                response = client_socket.recv(4096).decode('utf-8')
-                print(response)
-
-
-   
+            client_socket.sendall(command.encode('utf-8'))
+            response = client_socket.recv(1024).decode('utf-8')
+            print("Response:", response)
 
 if __name__ == "__main__":
     main()
@@ -300,34 +313,154 @@ if __name__ == "__main__":
 
 dalam main, adanya inisialisasi host dan port ( harus sama dengan server agar dapat terkoneksi ) jangan lupa inisialisasi objek socket bertipe sock_stream (TCP) berarti antar server dan client memerlukan handshake, adapun tahapnya: 
 
-- client_socket.sendall('connme'.encode('utf-8')): Ini bertujuan untuk memberi tahu server bahwa klien ingin membuka koneksi
+- client_socket.sendall('command'.encode('utf-8')): Ini bertujuan untuk memberi tahu ada kiriman dari klien ke server berupa command
 
-- response = client_socket.recv(1024).decode('utf-8'): Menerima respons dari server setelah mengirim pesan 'connme' dan mendekodekannya dari byte ke string.
+- response = client_socket.recv(1024).decode('utf-8'): Menerima respons dari server setelah terjadinya koneksi seperti respons server saat klien berhasil mengupload file 
 
 - print(response): Mencetak respons dari server
 
-- while True:: Memulai loop tak terbatas untuk menerima dan mengirim perintah antara klien dan server. ( namun saat proses upload dia terganggu)
+- while True:: Memulai loop tak terbatas untuk menerima dan mengirim perintah antara klien dan server.
 
 - command = input("Enter command: "): Memasukkan perintah.
 
 -  client_socket.sendall(command.encode('utf-8')): Mengirim perintah yang dimasukkan pengguna ke server setelah mengonversi ke byte.
 
-- if command == 'byebye':: jika command adalah byebye maka cetak 
-print("Closing connection."): Mencetak pesan bahwa koneksi sedang ditutup dan 
-break: Keluar dari loop jika pengguna memasukkan perintah 'byebye'.
-
-- while "Continue" in response:: Memulai loop jika respons dari server mengandung kata "Continue"
 
 # Tambahan 
 
 pastikan antar client dan server sudah terhubung baik sehingga program dapat dijalankan
 
-<<<<<<< HEAD
-https://github.com/aefafifah/socket-programming-python/blob/main/assets/koneksi%20awal.png
-=======
 
-![koneksiawal](https://github.com/aefafifah/socket-programming-python/blob/main/assets/koneksi%20awal.png)
->>>>>>> d1a13c6d1319e7449064e6f44c706c2028f563bb
+![koneksiawal](assets/koneksi%20awal.png)
+
+# Modifikasi Upload dan Download 
+
+SOAL TAMBAHAN 
+
+1. Modifikasi agar file yang diterima dimasukkan ke folder tertentu 
+
+2. Modifikasi program agar memberikan feedback nama file dan filesize yang diterima.
+
+3. Apa yang terjadi jika pengirim mengirimkan file dengan nama yang sama dengan file yang telah dikirim sebelumnya? Dapat menyebabkan masalah kah ? Lalu bagaimana solusinya? Implementasikan ke dalam program, solusi yang Anda berikan.
+
+# Jawaban 
+
+1. fungsi upload pada server 
+
+```py
+# Fungsi upload
+def upload(conn, filename, upload_dir='.'):
+    try:
+        # Memastikan upload_dir adalah path absolut
+        upload_dir = os.path.abspath(upload_dir)
+        
+        # Membuat direktori upload_dir jika belum ada
+        if not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
+        
+        # Menentukan lokasi file tujuan
+        file_destination = os.path.join(upload_dir, filename)
+        
+        # Memeriksa apakah file sudah ada di lokasi tujuan
+        if os.path.exists(file_destination):
+            user_input = input("File {} sudah tersedia di {}. Apakah Anda ingin menggantinya? (y/n): ".format(filename, upload_dir))
+            if user_input.lower() != 'y':
+                return "Upload dibatalkan. File {} tidak diunggah.".format(filename)
+        
+        # Membuka file untuk ditulis dalam mode binary
+        with open(file_destination, 'wb') as f:
+            # # Menerima data dari koneksi dan menulisnya ke file
+            # while True:
+            #     data = conn.recv(1024)
+            #     if not data:
+            #         break
+            #     f.write(data)
+        
+        # Mengembalikan pesan sukses dengan lokasi file yang diunggah
+            file_location = os.path.join(upload_dir, filename)
+        return "File {} telah diunggah ke {}.".format(filename, file_location)
+    except Exception as e:
+        # Mengembalikan pesan error jika terjadi kesalahan
+        error_message = "Terjadi kesalahan saat mengunggah {}: {}".format(filename, str(e))
+        print(error_message)
+        return error_message
+```
+Output Program
+
+![uploadnew](assets/newupload.png)
+
+dalam hal ini file telah diupload pada direktori saat ini, lalu bagaimana jika kita mengupload ke folder tertentu?
+tentu! jangan lupa untuk membuat folder kosong terlebih dahulu untuk mengetesnya 
+
+pada kali ini kita akan membuat folder bernama file
+
+![upload](assets/filetertentu.png)
+
+dan file terupload sempurna di dalam folder tersebut 
+
+![upload](assets/posisifile.png)
+
+2. Fungsi download pada server
+
+```py
+def download(conn, filename, download_dir='.'):
+    try:
+        # Memastikan download_dir adalah path absolut
+        download_dir = os.path.abspath(download_dir)
+        
+        # Membuka file untuk dibaca dalam mode binary
+        with open(os.path.join(download_dir, filename), 'rb') as f:
+            # Membaca data dari file dan mengirimkannya ke koneksi
+            data = f.read(1024)
+            while data:
+                conn.sendall(data)
+                data = f.read(1024)
+        
+        # Mengembalikan pesan sukses dengan lokasi file yang diunduh
+        file_location = os.path.join(download_dir, filename)
+        file_size = os.path.getsize(file_location)
+        return "File {} ({} bytes) has been downloaded from {}".format(filename, file_size, file_location)
+    except Exception as e:
+        # Mengembalikan pesan error jika terjadi kesalahan
+        error_message = "Terjadi kesalahan saat mengunduh {}: {}".format(filename, str(e))
+        print(error_message)
+        return error_message
+
+```
+
+jika pada bab sebelumnya, kita telah membuat download yang sudah bisa membaca isi file kali ini kita hasil dari downloadan tersebut akan kita tambahkan menjadi nama file serta ukurannya 
+
+![newdownload](assets/newdownload.png)
+
+dapat dilihat ketika awal download ia akan membaca isi dari download tersebut, yang kemudian ketika kita coba untuk mendownload lagi ia akan menampilkan pesan bahwa file telah terdownload 
+
+3. Upload File 
+
+pada bagian upload file 
+```py
+ # Memeriksa apakah file sudah ada di lokasi tujuan
+        if os.path.exists(file_destination):
+            user_input = input("File {} sudah tersedia di {}. Apakah Anda ingin menggantinya? (y/n): ".format(filename, upload_dir))
+            if user_input.lower() != 'y':
+                return "Upload dibatalkan. File {} tidak diunggah.".format(filename)
+
+```
+dapat dilihat ia akan mengecek apakah di dalam folder tersebut terdapat file yang telah tersedia atau belum, yang jika sudah tersedia ia akan meminta persetujuan jika yang dipilih adalah iya, ia akan menimpa file lama namun jika tidak, ia akan membatalkan penguploadan
+
+![test](assets/uploadtest.png)
+
+![test2](assets/uploadtest2.png)
+
+bukti test.txt ditimpa
+
+![test](assets/test.png)
+
+ia menjadi file kosong lagi, padahal sebelumnya memiliki isi 
+
+![testlama](assets/testlama.png)
+
+
+
 
 
 
