@@ -331,7 +331,6 @@ dalam main, adanya inisialisasi host dan port ( harus sama dengan server agar da
 pastikan antar client dan server sudah terhubung baik sehingga program dapat dijalankan
 
 
-<<<<<<< HEAD
 ![koneksiawal](assets/koneksi%20awal.png)
 
 # Modifikasi Upload dan Download 
@@ -462,9 +461,6 @@ ia menjadi file kosong lagi, padahal sebelumnya memiliki isi
 
 
 
-=======
-![koneksiawal](https://github.com/aefafifah/socket-programming-python/blob/main/assets/koneksi%20awal.png)
->>>>>>> 69a46304711396c14f4696d9184a21b4023600dc
 
 
 
